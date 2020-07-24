@@ -77,6 +77,21 @@
         <button id=snapshot>Create snapshot</button>
       </section>
 
+      <section class="experimental">
+        <h4>octoprint</h4>
+        <div class="controls">
+          <label for="octoprint-ip">Octoprint IP</label>
+          <input type="text" id="octoprint-ip" value=""/>
+        </div>
+
+        <div class="controls">
+          <label for="octoprint-key">Octoprint API key</label>
+          <input type="text" id="octoprint-key" value=""/>
+        </div>
+        
+        <button id="connect-to-octoprint">Connect</button>
+      </section>
+
       <!-- <section class="experimental">
         <h4>experimental</h4>
         <div class="controls">
@@ -106,6 +121,7 @@
             >Download latest</a>
         </div>
       </section>
+      
       <section>
         <div>MIT License</div>
         <div>Copyright 2020</div>
@@ -122,6 +138,6 @@
   <script src="demo.js"></script>
   <script>
     const gcodeDemo = initDemo();
-    loadGCodeFromServer('benchy.gcode');
+    // loadGCodeFromServer('benchy.gcode');
   </script>
 </body>
