@@ -22,6 +22,7 @@
 </head>
 
 <body>
+  <div id="app">
   <div class="dnd">☝️ Drop a gcode file here to view it</div>
   <div class="version-box"><a href="https://www.npmjs.com/package/gcode-preview">
     <img src="https://img.shields.io/npm/v/gcode-preview.svg?style=flat"/>
@@ -33,48 +34,55 @@
       <br>
       <section>
         
-        file <a id="file-name">loading..</a>
-        <div id="layer-count"></div>
-        <div id="file-size"></div>
+        file <a id="file-name" :href="fileName">{{fileName}}</a>
+        <div id="layer-count">{{ layerCount }} layers</div>
+        <div id="file-size">{{fileSize}}</div>
       </section>
       <section>
         <div class="controls">
           <label>End layer</label>&nbsp;<input
+            v-model.number="endLayer"
+            @change="render"
             type="range"
             min="1"
             value="0"
             id="end-layer"
+            :max="layerCount"
+            :disabled="loading"
           />
         </div>
         <div class="controls">
           <label>Start layer</label>&nbsp;<input
+            v-model.number="startLayer"
+            @change="render"
             type="range"
             min="1"
             value="0"
             id="start-layer"
+            :max="layerCount"
+            :disabled="loading"
           />
         </div>
         <div class="controls">
           <label for="single-layer-mode">Single layer mode</label
-          ><input type="checkbox" id="single-layer-mode" />
+          ><input v-model="singleLayerMode" @change="render" type="checkbox" id="single-layer-mode" />
         </div>
         <div class="controls">
           <label for="extrusion">Extrusion</label
-          ><input type="checkbox" id="extrusion" />
+          ><input v-model="renderExtrusion" @change="render" type="checkbox" id="extrusion" />
         </div>
         <div class="controls">
           <label for="travel">Travel</label
-          ><input type="checkbox" id="travel" />
+          ><input v-model="renderTravel" @change="render" type="checkbox" id="travel" />
         </div>
         <div class="controls">
           <label for="highlight">Highlight top layer</label
-          ><input type="checkbox" id="highlight" />
+          ><input v-model="highlightTopLayer" @change="render" type="checkbox" id="highlight" />
         </div>
-
-        
       </section>
+
       <section>
-        <button id=snapshot>Create snapshot</button>
+        <button @click="saveSnapshot" id=snapshot>Create snapshot</button>
       </section>
 
       <!-- <section class="experimental">
@@ -88,9 +96,6 @@
     <div>
       <section>
         <br>
-        <div>
-          
-        </div>
         <div>
           <a href="https://github.com/remcoder/gcode-preview">Github repo</a>
         </div>
@@ -114,14 +119,23 @@
     </div>
   </div>
 
-  <canvas id="renderer" class="gcode-previewer"></canvas>
+  <canvas
+    id="renderer"
+    class="gcode-previewer"
+    @dragover="dragover"
+    @dragleave="dragleave"
+    @drop="drop"
+
+  ></canvas>
+  
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
   <script src="three.min.js"></script>
   <script src="OrbitControls.js"></script>
   <script src="canvas2image.js"></script>
   <script src="dist/gcode-preview.js"></script>
   <script src="demo.js"></script>
   <script>
-    const gcodeDemo = initDemo();
-    loadGCodeFromServer('benchy.gcode');
+    vm.loadGCodeFromServer('benchy.gcode');
   </script>
 </body>
