@@ -77,7 +77,7 @@
         <button id=snapshot>Create snapshot</button>
       </section>
 
-      <section class="experimental">
+      <form class="experimental" autocomplete="on">
         <h4>octoprint</h4>
         <div class="controls">
           <label for="octoprint-ip">Octoprint IP</label>
@@ -90,7 +90,7 @@
         </div>
         
         <button id="connect-to-octoprint">Connect</button>
-      </section>
+      </form>
 
       <!-- <section class="experimental">
         <h4>experimental</h4>
@@ -138,6 +138,17 @@
   <script src="demo.js"></script>
   <script>
     const gcodeDemo = initDemo();
-    // loadGCodeFromServer('benchy.gcode');
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('octoprint') && params.has('key') ) {
+      const octoprint = params.get('octoprint');
+      const key = params.get('key');
+      console.log(octoprint,key);
+      ipAddress.value = octoprint;
+      apiKey.value = key;
+      connectToOctoprint();
+    }
+    else {
+      loadGCodeFromServer('benchy.gcode');
+    }
   </script>
 </body>
