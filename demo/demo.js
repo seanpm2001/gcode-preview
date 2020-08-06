@@ -220,28 +220,31 @@ const octoprint = {
 const ipAddress = document.getElementById('octoprint-ip');
 const apiKey = document.getElementById('octoprint-key');
 
-async function connectToOctoprint() {
+function connectToOctoprint(e) {
+  if (e) e.preventDefault();
   console.log('connectToOctoprint')
   octoprint.ip = ipAddress.value;
   octoprint.apiKey = apiKey.value;
-  await connect(octoprint.ip, octoprint.apiKey)
+  connect();
 }
 
 document.getElementById('connect-to-octoprint').addEventListener('click', connectToOctoprint);
 
-async function connect(ip, apiKey) {
+async function connect() {
+  const ip = octoprint.ip;
+  const apiKey = octoprint.apiKey;
   console.log('connecting')
   const session = await login(ip, apiKey);
 
   this.socket = subscribe(ip, session);
   this.socket.onmessage = ev => {
     var data = JSON.parse(ev.data);
-    if (!data.current) {
-      return;
-    }
-    const oks = data.current.logs.filter(l => l.indexOf('Recv: ok') > -1)
-      .length;
-    octoprint.queue -= oks;
+    // if (!data.current) {
+    //   return;
+    // }
+    // const oks = data.current.logs.filter(l => l.indexOf('Recv: ok') > -1)
+    //   .length;
+    // octoprint.queue -= oks;
     onmessage(data);
   };
   this.socket.onclose = this.onClose;
@@ -270,35 +273,55 @@ function subscribe(ip, session) {
   return ws;
 }
 
-async function onmessage(data) {
-  // 
+function onmessage(data) {
+  // console.log(data);
   if (data.current) {
-
-    // console.log(data.current.busyFiles[0].path);
-    console.log(data.current.progress.filepos, data.current.job.file.size);
-    
-    if (octoprint.loaded)
-    {
-      const newPos = data.current.progress.filepos;
-      const chunk = octoprint.gcode.slice(octoprint.filepos, newPos)
-      preview.processGCode(chunk);
-      octoprint.filepos = newPos;
-    }
-
-
-    if (octoprint.gcode == 1) {
-      const file = data.current.job.file;
-      console.log(file.origin, data.current.job.file.path);
-      octoprint.gcode = 2;
-      // get gcode
-      const options = {
-        headers: {'X-Api-Key:': octoprint.apiKey},
-      };
-      const json  = await (await fetch(`http://${octoprint.ip}/api/files/${file.origin}/${file.path}?apikey=${octoprint.apiKey}`)).json();
-      console.log(json.refs.download)
-      octoprint.gcode =  await (await fetch(json.refs.download)) .text();
-      octoprint.loaded = true;
-    }
+    _updateState(data.current);
   }
-  // this.heartbeat();
+  else if (data.event) {
+    _handlePrinterEvent(data.event);
+  }
+}
+
+async function _updateState(current) {
+  // console.log(data.current.busyFiles[0].path);
+  // console.log(current.progress.filepos, current.job.file.size);
+    
+  if (octoprint.loaded)
+  {
+    const newPos = current.progress.filepos;
+    const chunk = octoprint.gcode.slice(octoprint.filepos, newPos)
+    preview.processGCode(chunk);
+    octoprint.filepos = newPos;
+  }
+
+
+  if (octoprint.gcode == 1) {
+    const file = current.job.file;
+    console.log(file.origin, current.job.file.path);
+    octoprint.gcode = 2;
+    // get gcode
+    const options = {
+      headers: {'X-Api-Key:': octoprint.apiKey},
+    };
+    const json  = await (await fetch(`http://${octoprint.ip}/api/files/${file.origin}/${file.path}?apikey=${octoprint.apiKey}`)).json();
+    console.log(json.refs.download)
+    octoprint.gcode =  await (await fetch(json.refs.download)) .text();
+    octoprint.loaded = true;
+  }
+}
+
+function _handlePrinterEvent(event) {
+  // console.log('event', event);
+
+  if (event.type == 'PrintStarted') {
+    _resetPrint();
+  }
+
+}
+
+function _resetPrint() {
+  preview.clear();
+  octoprint.gcode = 1;
+  octoprint.loaded = false;
 }
