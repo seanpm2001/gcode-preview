@@ -1,6 +1,7 @@
 {
   "hosting": {
     "public": "demo",
+    "target": "q42",
     "ignore": [
       "firebase.json",
       "**/.*",

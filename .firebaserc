@@ -1,5 +1,17 @@
 {
   "projects": {
     "default": "gcode-preview"
+  },
+  "targets": {
+    "gcode-preview": {
+      "hosting": {
+        "q42": [
+          "gcode-preview-octoprint"
+        ],
+        "demo": [
+          "gcode-preview"
+        ]
+      }
+    }
   }
 }
