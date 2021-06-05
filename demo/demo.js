@@ -286,11 +286,12 @@ function onmessage(data) {
 async function _updateState(current) {
   // console.log(data.current.busyFiles[0].path);
   // console.log(current.progress.filepos, current.job.file.size);
-    
+  console.log(current);
   if (octoprint.loaded)
   {
-    const newPos = current.progress.filepos;
-    const chunk = octoprint.gcode.slice(octoprint.filepos, newPos)
+    const newPos = current.progress.filepos || 0;
+    console.log(newPos);
+    const chunk = octoprint.gcode//.slice(octoprint.filepos, newPos)
     preview.processGCode(chunk);
     octoprint.filepos = newPos;
   }
@@ -302,11 +303,11 @@ async function _updateState(current) {
     octoprint.gcode = 2;
     // get gcode
     const options = {
-      headers: {'X-Api-Key:': octoprint.apiKey},
+      headers: {'X-Api-Key': octoprint.apiKey},
     };
     const json  = await (await fetch(`http://${octoprint.ip}/api/files/${file.origin}/${file.path}?apikey=${octoprint.apiKey}`)).json();
     console.log(json.refs.download)
-    octoprint.gcode =  await (await fetch(json.refs.download)) .text();
+    octoprint.gcode =  await (await fetch(json.refs.download, options)) .text();
     octoprint.loaded = true;
   }
 }
