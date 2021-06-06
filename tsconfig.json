@@ -3,15 +3,12 @@
       "declaration": true,
       "declarationDir": "./dist",
       "noImplicitAny": true,
-      "outDir": "./dist",
       "target": "es2015",
       "esModuleInterop": true,
+      "moduleResolution": "node",
       "module": "es2015",
-      "sourceMap": true,
+      "sourceMap": false,
       "baseUrl": ".",
-      "paths": {
-        "three": ["node_modules/three/src/Three"]
-      },
       "typeRoots" : ["types","node_modules/@types"]
     },
     "files": ["src/gcode-preview.ts"]

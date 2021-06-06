@@ -1,7 +1,8 @@
-import typescript from 'rollup-plugin-typescript2';
+import typescript from '@rollup/plugin-typescript';
 import pkg from './package.json';
 import {terser} from 'rollup-plugin-terser';
-import resolve from 'rollup-plugin-node-resolve';
+import resolve from '@rollup/plugin-node-resolve';
+
 
 export default {
  input: 'src/gcode-preview.ts', // our source file
@@ -15,19 +16,14 @@ export default {
    format: 'umd',
    name: 'GCodePreview', // the global which can be used in a browser
    globals: {
-    'three': 'THREE',
-    'three-orbitcontrols': "THREE.OrbitControls"
+    'three': 'THREE'
    }
   }
  ],
- external: [
-  ...Object.keys(pkg.dependencies || {})
- ],
+ external: ['three'],
  plugins: [
   resolve(),
-  typescript({
-   typescript: require('typescript'),
-  }),
+  typescript(),
   terser() // minifies generated bundles
  ]
 };
